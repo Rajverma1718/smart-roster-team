@@ -1,0 +1,61 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function owner() {
+      return request.auth != null
+        && request.auth.token.email == 'OWNER_EMAIL@example.com'
+        && request.auth.token.email_verified == true;
+    }
+    function valid() {
+      return request.resource.data.keys().hasOnly(['payload','revision','updatedAt','updatedBy'])
+        && request.resource.data.payload is string
+        && request.resource.data.payload.size() <= 800000
+        && request.resource.data.updatedAt == request.time
+        && request.resource.data.updatedBy == request.auth.uid;
+    }
+    match /workspaces/personal {
+      allow read: if owner();
+      allow create: if owner() && valid() && request.resource.data.revision == 1;
+      allow update: if owner() && valid() && request.resource.data.revision == resource.data.revision + 1;
+    }
+    function memberAccount(email) {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email == email;
+    }
+    match /teamMembers/{email} {
+      allow get: if owner() || memberAccount(email);
+      allow list, write: if owner();
+      function activeMember() {
+        return memberAccount(email)
+          && exists(/databases/$(database)/documents/teamMembers/$(email));
+      }
+      match /schedules/{month} {
+        allow read: if owner() || activeMember();
+        allow write: if owner();
+      }
+      match /tasks/{task} {
+        allow read: if owner() || activeMember();
+        allow create, delete: if owner();
+        allow update: if owner() || (activeMember()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+          && ((resource.data.status == 'To do' && request.resource.data.status == 'In progress')
+            || (resource.data.status in ['To do', 'In progress'] && request.resource.data.status == 'Done')));
+      }
+      match /leave/{date} {
+        allow read: if owner() || activeMember();
+        allow update: if owner();
+        allow create: if activeMember()
+          && request.resource.data.keys().hasOnly(['date','reason','status','createdAt'])
+          && date.matches('[0-9]{4}-[0-9]{2}-[0-9]{2}')
+          && request.resource.data.date == date
+          && request.resource.data.reason is string
+          && request.resource.data.reason.size() > 0
+          && request.resource.data.reason.size() <= 500
+          && request.resource.data.status == 'Pending'
+          && request.resource.data.createdAt == request.time;
+      }
+    }
+  }
+}
+
