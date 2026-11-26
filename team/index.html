@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Smart Roster | Team portal</title>
+<link rel="stylesheet" href="../personal/style.css">
+<style>
+:root{color-scheme:light}
+body{margin:0;background:#f3f7fa;color:#17283d}
+[hidden]{display:none!important}
+.team-bar{background:#142439;color:white}
+.team-bar>div{max-width:1180px;margin:auto;padding:16px 24px;display:flex;align-items:center;gap:12px}
+.team-bar small{display:block;color:#c5d5e4}
+.team-bar #logout{margin-left:auto}
+.team-main{max-width:1180px;margin:auto;padding:28px 24px}
+.team-intro{border-radius:20px;padding:clamp(22px,5vw,44px);background:linear-gradient(115deg,#103b48,#106b60);color:white;margin-bottom:20px}
+.team-intro h1{margin:0;color:white;font-size:clamp(1.75rem,5vw,2.7rem)}
+.team-intro p{margin:8px 0 0;color:#d9f4ee}
+.team-nav{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 20px}
+.team-nav a,.roster-link{display:inline-block;padding:8px 13px;border:1px solid #d3e0e7;border-radius:9px;background:#fff;color:#075951;text-decoration:none;font-weight:650}
+.team-nav a:hover,.roster-link:hover{background:#eaf6f3}
+#portal{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.team-card{min-width:0;background:white;border:1px solid #dce6ed;border-radius:16px;padding:20px;scroll-margin:16px}
+.team-card.wide{grid-column:1/-1}
+.team-card h2,.team-card h3{margin:0 0 14px;color:#17283d}
+.team-card form{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-top:12px}
+.team-card form label{flex:1 1 145px;min-width:0}
+.team-card input,.team-card select{width:100%;min-width:0}
+.team-card form button,#login{background:#087065;color:white;border-color:#087065}
+.team-card form button:disabled{opacity:.5}
+.team-card .table-wrap{overflow:auto}
+.team-card table{width:100%;margin:0}
+.team-card ul{padding-left:20px;margin-bottom:0}
+.team-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.team-metrics article{background:#eef7f5;border-radius:12px;padding:14px}
+.team-metrics strong{display:block;color:#075951;font-size:1.7rem}
+#notice:not(:empty){padding:12px;background:white;border-radius:10px}
+a:focus-visible,button:focus-visible{outline:3px solid #19a490;outline-offset:3px}
+@media(max-width:720px){.team-main{padding:16px}#portal{grid-template-columns:1fr}.team-card{padding:14px}}
+</style>
+<body>
+<header class="team-bar"><div><span class="logo" aria-hidden="true">SR</span><div><strong>Smart Roster</strong><small>Team workspace</small></div><button id="logout" hidden>Sign out</button></div></header>
+<main class="team-main">
+  <section class="team-intro"><h1>Team portal</h1><p>Schedules, tasks, and time off in one place.</p></section>
+  <button id="login" class="primary">Continue with Google</button>
+  <p id="notice" role="status"></p>
+  <nav id="sections" class="team-nav" aria-label="Team portal sections" hidden></nav>
+  <div id="portal" hidden></div>
+</main>
+<script src="../personal/engine.js"></script>
+<script type="module" src="./portal.mjs"></script>
+</body>
+</html>
